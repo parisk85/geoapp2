@@ -52,18 +52,20 @@ public class Locator {
 				JSONObject latlng = obj.getJSONObject("latLng");
 				double lat = latlng.getDouble("lat");
 				double lng = latlng.getDouble("lng");
-				String adminArea5 = obj.getString("adminArea5");
+				String city = obj.getString("adminArea5");
 				String postalCode = obj.getString("postalCode");
-				String adminArea3 = obj.getString("adminArea3");
+				String state = obj.getString("adminArea3");
 				String street = obj.getString("street");
+				String country = obj.getString("adminArea1");
 				
 				Location location = new Location();
-				location.setAdminArea3(adminArea3);
-				location.setAdminArea5(adminArea5);
+				location.setState(state);
+				location.setCity(city);
 				location.setLat(lat);
 				location.setLng(lng);
 				location.setPostalCode(postalCode);
 				location.setStreet(street);
+				location.setCountry(country);
 				
 				return location;
 			} catch (JSONException e) {

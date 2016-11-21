@@ -3,10 +3,35 @@ package com.parisk85;
 public class Location {
 	private double lat;
 	private double lng;
-	private String adminArea5;
+	private String city;
 	private String postalCode;
-	private String adminArea3;
+	private String state;
 	private String street;
+	private String country;
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
+	public String getState() {
+		return state;
+	}
+
+	public void setState(String state) {
+		this.state = state;
+	}
+
+	public String getCountry() {
+		return country;
+	}
+
+	public void setCountry(String country) {
+		this.country = country;
+	}
 
 	public double getLat() {
 		return lat;
@@ -24,28 +49,12 @@ public class Location {
 		this.lng = lng;
 	}
 
-	public String getAdminArea5() {
-		return adminArea5;
-	}
-
-	public void setAdminArea5(String adminArea5) {
-		this.adminArea5 = adminArea5;
-	}
-
 	public String getPostalCode() {
 		return postalCode;
 	}
 
 	public void setPostalCode(String postalCode) {
 		this.postalCode = postalCode;
-	}
-
-	public String getAdminArea3() {
-		return adminArea3;
-	}
-
-	public void setAdminArea3(String adminArea3) {
-		this.adminArea3 = adminArea3;
 	}
 
 	public String getStreet() {
