@@ -10,8 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Locator {
-	private static String URL = "http://www.mapquestapi.com/geocoding/v1/address?key=SaY9oeWzmRRRcQQ5U4TY33JgHrF8QUsi&location=";
-
+	private static final String URL = "http://www.mapquestapi.com/geocoding/v1/address?key=SaY9oeWzmRRRcQQ5U4TY33JgHrF8QUsi&location=";
+	private static final String REVERSE_URL  = "https://www.mapquestapi.com/geocoding/v1/reverse?key=SaY9oeWzmRRRcQQ5U4TY33JgHrF8QUsi&location=";
+	private static final String REVERSE_URL_SUFFIX = "&outFormat=json&thumbMaps=false";
+	
 	private static String prepareAddress(String address) {
 		StringBuilder stringBuilder = new StringBuilder();
 		address = address.replace(" ", ",");
@@ -79,7 +81,9 @@ public class Locator {
 		return null;
 	}
 
-	public static void reverse() {
-
+	public static Location reverse(com.esri.core.geometry.Point mapPoint) {
+		String str = REVERSE_URL + mapPoint.getX() + "," + mapPoint.getY() + REVERSE_URL_SUFFIX;
+		System.out.println(str);
+		return null;
 	}
 }

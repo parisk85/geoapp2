@@ -17,5 +17,10 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="var" path="ARCGIS_RUNTIME_FOR_JAVA_TOOLKIT/ArcGIS_Runtime_Java_Toolkit.jar" sourcepath="ARCGIS_RUNTIME_FOR_JAVA_TOOLKIT/ArcGIS_Runtime_Java_Toolkit-sources.jar">
+		<attributes>
+			<attribute name="javadoc_location" value="jar:file:C:\eclipse\configuration\org.eclipse.osgi\1187\0\.cp\lib\/ArcGIS_Runtime_Java_Toolkit-javadoc.jar!/"/>
+		</attributes>
+	</classpathentry>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>

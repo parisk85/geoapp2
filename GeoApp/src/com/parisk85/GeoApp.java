@@ -1,6 +1,7 @@
 package com.parisk85;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
@@ -27,6 +28,8 @@ import com.esri.core.geometry.Point;
 import com.esri.core.geometry.SpatialReference;
 import com.esri.core.map.Graphic;
 import com.esri.core.symbol.PictureMarkerSymbol;
+import com.esri.core.symbol.SimpleMarkerSymbol;
+import com.esri.core.symbol.SimpleMarkerSymbol.Style;
 import com.esri.map.GraphicsLayer;
 import com.esri.map.JMap;
 import com.esri.map.MapOptions;
@@ -35,7 +38,7 @@ import com.esri.map.MapOverlay;
 
 public class GeoApp extends MapOverlay {
 
-	private static int ROW_COUNTER = 0;
+	private static int row_counter = 0;
 	private Location location;
 
 	private JFrame window;
@@ -49,8 +52,8 @@ public class GeoApp extends MapOverlay {
 	private JScrollPane tableScrollPane;
 	private JTable geoTable;
 	private DefaultTableModel model;
-	private String[] columnNames = { "ID", "Address", "Country", "State",
-			"City", "Postal Code", "Crime Type", "Latitude", "Longitude" };
+	private String[] columnNames = { "ID", "Address", "Country", "State", "City", "Postal Code", "Crime Type",
+			"Latitude", "Longitude" };
 	private Object[][] data = new Object[5000][columnNames.length];
 	private JLabel addressLabel;
 	private JTextField addressField;
@@ -65,7 +68,9 @@ public class GeoApp extends MapOverlay {
 	private JTextField postalCodeField;
 	private String[] crimeTypes = { "Car Theft", "Burglary" };
 	private JLabel crimeTypeLabel;
+	private JLabel reverseCrimeTypeLabel;
 	private JComboBox<String> crimeTypeBox = new JComboBox(crimeTypes);
+	private JComboBox<String> reverseCrimeTypeBox = new JComboBox(crimeTypes);
 	private JTextField streetField;
 
 	private JLabel latLabel;
@@ -73,6 +78,21 @@ public class GeoApp extends MapOverlay {
 	private JTextField latField;
 	private JTextField lngField;
 	private JButton addCrimeButton;
+	private JButton reverseAddCrimeButton;
+
+	private JTextField reverseAddressField;
+	private JLabel reverseLatLabel;
+	private JTextField reverseLatField;
+	private JLabel reverseLngLabel;
+	private JTextField reverseLngField;
+	private JLabel reverseCountryLabel;
+	private JTextField reverseCountryField;
+	private JLabel reverseStateLabel;
+	private JTextField reverseStateField;
+	private JLabel reverseCityLabel;
+	private JTextField reverseCityField;
+	private JLabel reversePostalCodeLabel;
+	private JTextField reversePostalCodeField;
 
 	private GraphicsLayer graphicsLayer = new GraphicsLayer();
 	private PictureMarkerSymbol symbol = new PictureMarkerSymbol(
@@ -127,7 +147,40 @@ public class GeoApp extends MapOverlay {
 		crimeTypeBox.setPreferredSize(new Dimension(180, 24));
 		// /////////////////////////
 		addCrimeButton = new JButton("Add Crime");
+		// right panel///////////////
+		reverseAddressField = new JTextField();
+		reverseAddressField.setPreferredSize(new Dimension(320, 24));
+		reverseAddressField.setEditable(false);
+		reverseLatLabel = new JLabel("Lat: ");
+		reverseLatField = new JTextField();
+		reverseLatField.setPreferredSize(new Dimension(130, 24));
+		reverseLatField.setEditable(false);
+		reverseLngLabel = new JLabel("Lng: ");
+		reverseLngField = new JTextField();
+		reverseLngField.setPreferredSize(new Dimension(130, 24));
+		reverseLngField.setEditable(false);
+		reverseCountryLabel = new JLabel("Country: ");
+		reverseCountryField = new JTextField();
+		reverseCountryField.setPreferredSize(new Dimension(100, 24));
+		reverseCountryField.setEditable(false);
+		reverseStateLabel = new JLabel("State: ");
+		reverseStateField = new JTextField();
+		reverseStateField.setPreferredSize(new Dimension(110, 24));
+		reverseStateField.setEditable(false);
+		// ////////////////////////
+		reverseCityLabel = new JLabel("City: ");
+		reverseCityField = new JTextField();
+		reverseCityField.setPreferredSize(new Dimension(100, 24));
+		reverseCityField.setEditable(false);
+		reversePostalCodeLabel = new JLabel("Postal Code: ");
+		reversePostalCodeField = new JTextField();
+		reversePostalCodeField.setPreferredSize(new Dimension(100, 24));
+		reversePostalCodeField.setEditable(false);
+		reverseCrimeTypeLabel = new JLabel("Crime Type: ");
+		reverseCrimeTypeBox.setPreferredSize(new Dimension(180, 24));
 		// /////////////////////////
+		reverseAddCrimeButton = new JButton("Add Crime");
+		////////////////////////////
 		geocodePanel = new JPanel();
 		geocodePanel.add(addressLabel);
 		geocodePanel.add(addressField);
@@ -149,6 +202,22 @@ public class GeoApp extends MapOverlay {
 		geocodePanel.add(crimeTypeBox);
 		geocodePanel.add(addCrimeButton);
 		reversePanel = new JPanel();
+		reversePanel.add(reverseAddressField);
+		reversePanel.add(reverseLatLabel);
+		reversePanel.add(reverseLatField);
+		reversePanel.add(reverseLngLabel);
+		reversePanel.add(reverseLngField);
+		reversePanel.add(reverseCountryLabel);
+		reversePanel.add(reverseCountryField);
+		reversePanel.add(reverseStateLabel);
+		reversePanel.add(reverseStateField);
+		reversePanel.add(reverseCityLabel);
+		reversePanel.add(reverseCityField);
+		reversePanel.add(reversePostalCodeLabel);
+		reversePanel.add(reversePostalCodeField);
+		reversePanel.add(reverseCrimeTypeLabel);
+		reversePanel.add(reverseCrimeTypeBox);
+		reversePanel.add(reverseAddCrimeButton);
 
 		leftPanel.add("Geocode", geocodePanel);
 		leftPanel.add("Reverse", reversePanel);
@@ -161,18 +230,15 @@ public class GeoApp extends MapOverlay {
 			model.addColumn(s);
 		tableScrollPane = new JScrollPane(geoTable);
 
-		MapOptions mapOptions = new MapOptions(MapType.STREETS, 38.0103,
-				23.6264, 14);
+		MapOptions mapOptions = new MapOptions(MapType.STREETS, 38.0103, 23.6264, 14);
 		map = new JMap(mapOptions);
 		map.getLayers().add(graphicsLayer);
 		map.addMapOverlay(this);
 		rightPanel.add(map, BorderLayout.CENTER);
 
-		horizontalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT,
-				rightPanel, tableScrollPane);
+		horizontalSplitPane = new JSplitPane(JSplitPane.VERTICAL_SPLIT, rightPanel, tableScrollPane);
 		horizontalSplitPane.setDividerLocation(Integer.MAX_VALUE);
-		verticalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT,
-				leftPanel, horizontalSplitPane);
+		verticalSplitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, leftPanel, horizontalSplitPane);
 		verticalSplitPane.setDividerLocation(350);
 
 		window.add(verticalSplitPane);
@@ -201,8 +267,7 @@ public class GeoApp extends MapOverlay {
 					postalCodeField.setText(location.getPostalCode());
 					map.centerAt(location.getLat(), location.getLng());
 					SpatialReference mapSR = map.getSpatialReference();
-					Point point = GeometryEngine.project(location.getLng(),
-							location.getLat(), mapSR);
+					Point point = GeometryEngine.project(location.getLng(), location.getLat(), mapSR);
 					Graphic pointGraphic = new Graphic(point, symbol);
 					graphicsLayer.removeAll();
 					graphicsLayer.addGraphic(pointGraphic);
@@ -220,11 +285,8 @@ public class GeoApp extends MapOverlay {
 					System.out.println("Country: " + location.getCountry());
 					System.out.println("State: " + location.getState());
 					System.out.println("City: " + location.getCity());
-					System.out.println("Postal Code: "
-							+ location.getPostalCode());
-					System.out.println("Crime Type: "
-							+ crimeTypeBox.getItemAt(crimeTypeBox
-									.getSelectedIndex()));
+					System.out.println("Postal Code: " + location.getPostalCode());
+					System.out.println("Crime Type: " + crimeTypeBox.getItemAt(crimeTypeBox.getSelectedIndex()));
 					System.out.println("Latitude: " + location.getLat());
 					System.out.println("Longitude: " + location.getLng());
 
@@ -235,15 +297,21 @@ public class GeoApp extends MapOverlay {
 					row.setState(location.getState());
 					row.setCity(location.getCity());
 					row.setPostalCode(location.getPostalCode());
-					row.setCrimeType(crimeTypeBox.getItemAt(crimeTypeBox
-							.getSelectedIndex()));
+					row.setCrimeType(crimeTypeBox.getItemAt(crimeTypeBox.getSelectedIndex()));
 					row.setLat(location.getLat());
 					row.setLng(location.getLng());
-					model.addRow(new Object[] { row.getId(), row.getAddress(),
-							row.getCountry(), row.getState(), row.getCity(),
-							row.getPostalCode(), row.getCrimeType(),
-							row.getLat(), row.getLng() });
+					model.addRow(new Object[] { row.getId(), row.getAddress(), row.getCountry(), row.getState(),
+							row.getCity(), row.getPostalCode(), row.getCrimeType(), row.getLat(), row.getLng() });
 				}
+			}
+		});
+
+		reverseAddCrimeButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// TODO Auto-generated method stub
+
 			}
 		});
 
@@ -259,7 +327,22 @@ public class GeoApp extends MapOverlay {
 	@Override
 	public void onMouseClicked(MouseEvent event) {
 		super.onMouseMoved(event);
+		if (leftPanel.getSelectedIndex() == 1) {
+			try {
+				java.awt.Point screenPoint = event.getPoint();
+				com.esri.core.geometry.Point mapPoint = map.toMapPoint(screenPoint.x, screenPoint.y);
+				SimpleMarkerSymbol simpleMarker = new SimpleMarkerSymbol(Color.RED, 10, Style.CROSS);
 
+				Point pointGeometry = mapPoint;
+
+				Graphic pointGraphic = new Graphic(pointGeometry, simpleMarker);
+				graphicsLayer.removeAll();
+				graphicsLayer.addGraphic(pointGraphic);
+				location = Locator.reverse(pointGeometry);
+			} catch (Exception e) {
+
+			}
+		}
 	}
 
 	/**
