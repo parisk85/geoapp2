@@ -82,8 +82,59 @@ public class Locator {
 	}
 
 	public static Location reverse(com.esri.core.geometry.Point mapPoint) {
-		String str = REVERSE_URL + mapPoint.getX() + "," + mapPoint.getY() + REVERSE_URL_SUFFIX;
-		System.out.println(str);
+		String ltLn = REVERSE_URL + mapPoint.getY() + "," + mapPoint.getX() + REVERSE_URL_SUFFIX;
+		try {
+			URL url = new URL(ltLn);
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+			conn.setRequestMethod("GET");
+			conn.setRequestProperty("Accept", "application/json");
+
+			if (conn.getResponseCode() != 200) {
+				throw new RuntimeException("Failed : HTTP error code : " + conn.getResponseCode());
+			}
+
+			BufferedReader br = new BufferedReader(new InputStreamReader((conn.getInputStream())));
+
+			String output;
+			StringBuilder str = new StringBuilder();
+			while ((output = br.readLine()) != null) {
+				str.append(output);
+			}
+
+			try {
+				JSONObject obj = new JSONObject(str.toString());
+				JSONArray arr = obj.getJSONArray("results");
+				obj = arr.getJSONObject(0);
+				arr = obj.getJSONArray("locations");
+				obj = arr.getJSONObject(0);
+				//System.out.println(obj);
+				JSONObject latlng = obj.getJSONObject("latLng");
+				double lat = latlng.getDouble("lat");
+				double lng = latlng.getDouble("lng");
+				String city = obj.getString("adminArea5");
+				String postalCode = obj.getString("postalCode");
+				String state = obj.getString("adminArea3");
+				String street = obj.getString("street");
+				String country = obj.getString("adminArea1");
+				
+				Location location = new Location();
+				location.setState(state);
+				location.setCity(city);
+				location.setLat(lat);
+				location.setLng(lng);
+				location.setPostalCode(postalCode);
+				location.setStreet(street);
+				location.setCountry(country);
+				
+				return location;
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+			conn.disconnect();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
 		return null;
 	}
 }

@@ -9,7 +9,9 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.text.DecimalFormat;
 import java.util.Random;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -23,6 +25,7 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
+import com.esri.core.geometry.CoordinateConversion;
 import com.esri.core.geometry.GeometryEngine;
 import com.esri.core.geometry.Point;
 import com.esri.core.geometry.SpatialReference;
@@ -310,8 +313,30 @@ public class GeoApp extends MapOverlay {
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				// TODO Auto-generated method stub
+				if (location != null) {
+					System.out.println("ID: " + createRandomId(data));
+					System.out.println("Address: " + location.getStreet());
+					System.out.println("Country: " + location.getCountry());
+					System.out.println("State: " + location.getState());
+					System.out.println("City: " + location.getCity());
+					System.out.println("Postal Code: " + location.getPostalCode());
+					System.out.println("Crime Type: " + crimeTypeBox.getItemAt(crimeTypeBox.getSelectedIndex()));
+					System.out.println("Latitude: " + location.getLat());
+					System.out.println("Longitude: " + location.getLng());
 
+					ExcelRow row = new ExcelRow();
+					row.setId(createRandomId(data));
+					row.setAddress(location.getStreet());
+					row.setCountry(location.getCountry());
+					row.setState(location.getState());
+					row.setCity(location.getCity());
+					row.setPostalCode(location.getPostalCode());
+					row.setCrimeType(crimeTypeBox.getItemAt(crimeTypeBox.getSelectedIndex()));
+					row.setLat(location.getLat());
+					row.setLng(location.getLng());
+					model.addRow(new Object[] { row.getId(), row.getAddress(), row.getCountry(), row.getState(),
+							row.getCity(), row.getPostalCode(), row.getCrimeType(), row.getLat(), row.getLng() });
+				}
 			}
 		});
 
@@ -333,12 +358,23 @@ public class GeoApp extends MapOverlay {
 				com.esri.core.geometry.Point mapPoint = map.toMapPoint(screenPoint.x, screenPoint.y);
 				SimpleMarkerSymbol simpleMarker = new SimpleMarkerSymbol(Color.RED, 10, Style.CROSS);
 
-				Point pointGeometry = mapPoint;
+				SpatialReference spacRef = SpatialReference.create(4326);
+				Point ltLn = (Point) GeometryEngine.project(mapPoint, map.getSpatialReference(), spacRef);
+				DecimalFormat formatter = new DecimalFormat("##.######");
 
-				Graphic pointGraphic = new Graphic(pointGeometry, simpleMarker);
+				Graphic pointGraphic = new Graphic(mapPoint, simpleMarker);
 				graphicsLayer.removeAll();
 				graphicsLayer.addGraphic(pointGraphic);
-				location = Locator.reverse(pointGeometry);
+				location = Locator.reverse(ltLn);
+				if (location != null) {
+					reverseAddressField.setText(location.getStreet());
+					reverseLatField.setText(Double.toString(location.getLat()));
+					reverseLngField.setText(Double.toString(location.getLng()));
+					reverseCountryField.setText(location.getCountry());
+					reverseStateField.setText(location.getState());
+					reverseCityField.setText(location.getCity());
+					reversePostalCodeField.setText(location.getPostalCode());					
+				}
 			} catch (Exception e) {
 
 			}
